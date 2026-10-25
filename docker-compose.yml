@@ -1,0 +1,14 @@
+name: pz16-integration
+services:
+  pg:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: notes_test
+    ports: ["54321:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test -d notes_test"]
+      interval: 2s
+      timeout: 2s
+      retries: 20
