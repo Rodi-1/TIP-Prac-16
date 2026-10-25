@@ -1,0 +1,24 @@
+name: API integration
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: notes_test
+        ports: ["54321:5432"]
+        options: >-
+          --health-cmd "pg_isready -U test -d notes_test"
+          --health-interval 2s --health-timeout 2s --health-retries 20
+    env:
+      DB_DSN: postgres://test:test@localhost:54321/notes_test?sslmode=disable
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - run: go test -v -shuffle=on -count=2 ./...
